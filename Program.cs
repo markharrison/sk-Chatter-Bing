@@ -50,7 +50,6 @@ namespace Chatter
             var kernel = kernelBuilder.Build();
 
             BingConnector bing = new BingConnector(bingApikey);
-
             kernel.ImportPluginFromObject(new WebSearchEnginePlugin(bing), "bing");
 
             var chatService = kernel.GetRequiredService<IChatCompletionService>();
