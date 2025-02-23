@@ -28,24 +28,6 @@ namespace Chatter
 
             AppSettings setx = new();
 
-            //var environmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "development";
-            //var hostBuilder = Host.CreateApplicationBuilder(args);
-            //hostBuilder.Configuration
-            //    .SetBasePath(Directory.GetCurrentDirectory())
-            //    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            //    .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
-            //    .AddEnvironmentVariables();
-
-            //var configuration = hostBuilder.Configuration;
-
-            //string azopwnaiApikey = configuration["AzOpenAI:ApiKey"] ?? "";
-            //string azopwnaiEndpoint = configuration["AzOpenAI:Endpoint"] ?? "";
-            //string azopenaiCCDeploymentname = configuration["AzOpenAI:ChatCompletionDeploymentName"] ?? "";
-            //string azopenaiEmbeddingDeploymentname = configuration["AzOpenAI:EmbeddingDeploymentName"] ?? "";
-            //bool traceOn = bool.TryParse(configuration["TraceOn"], out bool tOn) && tOn;
-            //string bingApikey = configuration["Bing:ApiKey"] ?? "";
-            //string bingEndpoint = configuration["Bing:Endpoint"] ?? "";
-
             var kernelBuilder = Kernel.CreateBuilder();
 
             kernelBuilder.AddAzureOpenAIChatCompletion(setx.azopenaiCCDeploymentname, setx.azopwnaiEndpoint, setx.azopwnaiApikey);
