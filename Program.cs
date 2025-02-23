@@ -10,6 +10,7 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Plugins.Web;
 using Microsoft.SemanticKernel.Plugins.Web.Bing;
 using OllamaSharp.Models.Chat;
+using SKProcess;
 using System.Diagnostics.Contracts;
 
 #pragma warning disable SKEXP0001, SKEXP0003, SKEXP0003, SKEXP0011, SKEXP0020, SKEXP0050, SKEXP0052, SKEXP0055, SKEXP0011, SKEXP0010, SKEXP0070
@@ -25,31 +26,33 @@ namespace Chatter
             Console.WriteLine("*** Chatter ***");
             Console.WriteLine("I am an assistant");
 
-            var environmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "development";
-            var hostBuilder = Host.CreateApplicationBuilder(args);
-            hostBuilder.Configuration
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+            AppSettings setx = new();
 
-            var configuration = hostBuilder.Configuration;
+            //var environmentName = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "development";
+            //var hostBuilder = Host.CreateApplicationBuilder(args);
+            //hostBuilder.Configuration
+            //    .SetBasePath(Directory.GetCurrentDirectory())
+            //    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            //    .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+            //    .AddEnvironmentVariables();
 
-            string azopwnaiApikey = configuration["AzOpenAI:ApiKey"] ?? "";
-            string azopwnaiEndpoint = configuration["AzOpenAI:Endpoint"] ?? "";
-            string azopenaiCCDeploymentname = configuration["AzOpenAI:ChatCompletionDeploymentName"] ?? "";
-            string azopenaiEmbeddingDeploymentname = configuration["AzOpenAI:EmbeddingDeploymentName"] ?? "";
-            bool traceOn = bool.TryParse(configuration["TraceOn"], out bool tOn) && tOn;
-            string bingApikey = configuration["Bing:ApiKey"] ?? "";
-            string bingEndpoint = configuration["Bing:Endpoint"] ?? "";
+            //var configuration = hostBuilder.Configuration;
+
+            //string azopwnaiApikey = configuration["AzOpenAI:ApiKey"] ?? "";
+            //string azopwnaiEndpoint = configuration["AzOpenAI:Endpoint"] ?? "";
+            //string azopenaiCCDeploymentname = configuration["AzOpenAI:ChatCompletionDeploymentName"] ?? "";
+            //string azopenaiEmbeddingDeploymentname = configuration["AzOpenAI:EmbeddingDeploymentName"] ?? "";
+            //bool traceOn = bool.TryParse(configuration["TraceOn"], out bool tOn) && tOn;
+            //string bingApikey = configuration["Bing:ApiKey"] ?? "";
+            //string bingEndpoint = configuration["Bing:Endpoint"] ?? "";
 
             var kernelBuilder = Kernel.CreateBuilder();
 
-            kernelBuilder.AddAzureOpenAIChatCompletion(azopenaiCCDeploymentname, azopwnaiEndpoint, azopwnaiApikey);
+            kernelBuilder.AddAzureOpenAIChatCompletion(setx.azopenaiCCDeploymentname, setx.azopwnaiEndpoint, setx.azopwnaiApikey);
 
             var kernel = kernelBuilder.Build();
 
-            BingConnector bing = new BingConnector(bingApikey);
+            BingConnector bing = new BingConnector(setx.bingApikey);
             kernel.ImportPluginFromObject(new WebSearchEnginePlugin(bing), "bing");
 
             var chatService = kernel.GetRequiredService<IChatCompletionService>();
@@ -90,7 +93,7 @@ namespace Chatter
 
                     chatHistory.AddAssistantMessage(fullContent);
 
-                    if (traceOn)
+                    if (setx.traceOn)
                     {
                         foreach (ChatMessageContent message in chatHistory)
                         {
@@ -102,7 +105,7 @@ namespace Chatter
                                 {
                                     if (item is Microsoft.SemanticKernel.FunctionCallContent functionCallContent)
                                     {
-                                        Console.WriteLine($"     {functionCallContent.FunctionName} ({functionCallContent.PluginName}) ");
+                                        Console.WriteLine($"{functionCallContent.FunctionName} ({functionCallContent.PluginName}) ");
                                     }
                                 }
                             }
